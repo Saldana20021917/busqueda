@@ -8,7 +8,7 @@
 <body class="bg-light">
     <div class="container mt-5">
         <h1 class="text-center mb-4">Buscador de Noticias con NewsAPI</h1>
-        <form method="POST" class="row g-3">
+        <form method="POST" class="row g-3" id="formulario">
             <div class="col-md-6">
                 <label for="temas" class="form-label">Temas (separados por comas)</label>
                 <input type="text" class="form-control" id="temas" name="temas" required>
@@ -26,20 +26,55 @@
             </div>
         </form>
 
-        {% if resultados %}
         <hr>
         <h3 class="mt-4">Resultados:</h3>
-        <ul class="list-group">
-            {% for noticia in resultados %}
-            <li class="list-group-item">
-                <h5>{{ noticia.titulo }}</h5>
-                <p>{{ noticia.descripcion }}</p>
-                <small>Fuente: {{ noticia.fuente }} | Fecha: {{ noticia.fecha }}</small><br>
-                <a href="{{ noticia.enlace }}" target="_blank">Leer más</a>
-            </li>
-            {% endfor %}
-        </ul>
-        {% endif %}
+        <ul class="list-group" id="noticias-container"></ul>
     </div>
+
+    <script>
+        document.getElementById('formulario').addEventListener('submit', function(event) {
+            event.preventDefault();  // Evitar que el formulario se envíe de la forma tradicional
+            
+            const temas = document.getElementById('temas').value.split(',');
+            const idioma = document.getElementById('idioma').value || 'es';
+            const limite = document.getElementById('limite').value || 10;
+            
+            fetch('/buscar_noticias', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    temas: temas,
+                    idioma: idioma,
+                    limite: limite
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Limpiar resultados previos
+                const container = document.getElementById('noticias-container');
+                container.innerHTML = '';
+
+                // Mostrar las noticias obtenidas
+                data.forEach(noticia => {
+                    const noticiaElemento = document.createElement('li');
+                    noticiaElemento.classList.add('list-group-item');
+                    noticiaElemento.innerHTML = `
+                        <h5>${noticia.titulo}</h5>
+                        <p>${noticia.descripcion}</p>
+                        <small>Fuente: ${noticia.fuente} | Fecha: ${noticia.fecha}</small><br>
+                        <a href="${noticia.enlace}" target="_blank">Leer más</a>
+                    `;
+                    container.appendChild(noticiaElemento);
+                });
+            })
+            .catch(error => {
+                console.error('Error al obtener noticias:', error);
+            });
+        });
+    </script>
 </body>
 </html>
+
+

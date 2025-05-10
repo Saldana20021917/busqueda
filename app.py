@@ -1,11 +1,14 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 from datetime import datetime, timedelta
 import requests
 from os import getenv
 from dotenv import load_dotenv
+from flask_cors import CORS  # Importamos CORS
 
 load_dotenv()
 app = Flask(__name__)
+CORS(app)  # Habilitamos CORS en toda la aplicación
+
 API_KEY = getenv("NEWS_API_KEY")
 
 def buscar_noticias(api_key, palabras_clave, idioma="es", max_noticias=20):
@@ -48,6 +51,25 @@ def index():
         resultados = buscar_noticias(API_KEY, temas, idioma, limite)
     return render_template('index.html', resultados=resultados)
 
+@app.route('/buscar_noticias', methods=['POST'])
+def buscar_noticias_post():
+    # Obtener datos enviados desde el frontend
+    datos = request.get_json()
+    temas = datos.get('temas', [])
+    idioma = datos.get('idioma', 'es')
+    limite = int(datos.get('limite', 10))
+    
+    # Buscar noticias con la función que ya tienes
+    resultados = buscar_noticias(API_KEY, temas, idioma, limite)
+    
+    # Devolver los resultados como JSON
+    return jsonify(resultados)
+
 if __name__ == '__main__':
     app.run(debug=True)
+
+print(f"API_KEY: {API_KEY}")
+
+
+
 
