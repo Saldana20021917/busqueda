@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Buscador de Noticias</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Buscador de Noticias con NewsAPI</h1>
+        <form method="POST" class="row g-3">
+            <div class="col-md-6">
+                <label for="temas" class="form-label">Temas (separados por comas)</label>
+                <input type="text" class="form-control" id="temas" name="temas" required>
+            </div>
+            <div class="col-md-3">
+                <label for="idioma" class="form-label">Idioma</label>
+                <input type="text" class="form-control" id="idioma" name="idioma" placeholder="es">
+            </div>
+            <div class="col-md-3">
+                <label for="limite" class="form-label">Máx noticias</label>
+                <input type="number" class="form-control" id="limite" name="limite" value="10" min="1" max="100">
+            </div>
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary w-100">Buscar</button>
+            </div>
+        </form>
+
+        {% if resultados %}
+        <hr>
+        <h3 class="mt-4">Resultados:</h3>
+        <ul class="list-group">
+            {% for noticia in resultados %}
+            <li class="list-group-item">
+                <h5>{{ noticia.titulo }}</h5>
+                <p>{{ noticia.descripcion }}</p>
+                <small>Fuente: {{ noticia.fuente }} | Fecha: {{ noticia.fecha }}</small><br>
+                <a href="{{ noticia.enlace }}" target="_blank">Leer más</a>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+</body>
+</html>
