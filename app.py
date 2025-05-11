@@ -3,12 +3,18 @@ from datetime import datetime, timedelta
 import requests
 from os import getenv
 from dotenv import load_dotenv
+import os
 
+# Cargar variables de entorno
 load_dotenv()
+
+# Crear app Flask
 app = Flask(__name__)
 
+# Obtener clave desde entorno
 API_KEY = getenv("NEWS_API_KEY")
 
+# Función para obtener noticias desde NewsAPI
 def buscar_noticias(api_key, palabras_clave, idioma="es", max_noticias=20):
     fecha_hasta = datetime.now()
     fecha_desde = fecha_hasta - timedelta(days=7)
@@ -38,9 +44,10 @@ def buscar_noticias(api_key, palabras_clave, idioma="es", max_noticias=20):
             "fecha": a.get('publishedAt', 'Sin fecha')
         } for a in articulos]
     except requests.exceptions.RequestException as e:
-        print(f"Error: {e}")
+        print(f"Error al consultar NewsAPI: {e}")
         return []
 
+# Ruta principal
 @app.route('/', methods=['GET', 'POST'])
 def index():
     resultados = []
@@ -51,8 +58,11 @@ def index():
         resultados = buscar_noticias(API_KEY, temas, idioma, limite)
     return render_template('index.html', resultados=resultados)
 
+# 🚀 Punto de entrada con soporte para Render
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
+
 
 
 
